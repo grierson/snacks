@@ -25,3 +25,13 @@
   (is (thrown? Exception
                (insert-money default-machine (money/->money 1 1 1 1 1 1)))))
 
+(deftest buy-snack-test
+  (let [{:keys [inside transaction]} (-> default-machine
+                                         (insert-money money/dollar)
+                                         (insert-money money/cent)
+                                         (buy-snack))]
+    (testing "transaction"
+      (is (= money/none transaction)))
+
+    (testing "inside"
+      (is (= (money/->money 1 0 0 1 0 0) inside)))))
