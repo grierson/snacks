@@ -25,23 +25,23 @@
            :args (spec/cat :machine any?
                            :money ::money/denomination))
 
-(defn allocate [inside transaction]
-  (let [twentyCount (min (int (/ transaction 20)) (:twenties inside))
+(defn allocate [{:keys [ones tens quarters dollars fives twenties]} transaction]
+  (let [twentyCount (min (int (/ transaction 20)) twenties)
         transaction (- transaction (* twentyCount 20))
 
-        fiveCount (min (int (/ transaction 5)) (:fives inside))
+        fiveCount (min (int (/ transaction 5)) fives)
         transaction (- transaction (* fiveCount 5))
 
-        dollarCount (min (int transaction) (:dollars inside))
+        dollarCount (min (int transaction) dollars)
         transaction (- transaction dollarCount)
 
-        quarterCount (min (int (/ transaction 0.25)) (:quarters inside))
+        quarterCount (min (int (/ transaction 0.25)) quarters)
         transaction (- transaction (* quarterCount 0.25))
 
-        tenCount (min (int (/ transaction 0.1)) (:tens inside))
+        tenCount (min (int (/ transaction 0.1)) tens)
         transaction (- transaction (* tenCount 0.1))
 
-        centCount (min (int (/ transaction 0.01)) (:ones inside))]
+        centCount (min (int (/ transaction 0.01)) ones)]
     (money/->money centCount tenCount quarterCount dollarCount fiveCount twentyCount)))
 
 
@@ -58,12 +58,13 @@
   (let [{:keys [price]} (get-in machine [:slots position])]
     (if (< transaction price)
       (throw Exception)
-      (let [change (allocate inside (- transaction price))]
-        (if (< (money/amount change) (- transaction price))
+      (let [requiredChange (- transaction price)
+            possibleChange (allocate inside requiredChange)]
+        (if (< (money/amount possibleChange) requiredChange)
           (throw Exception)
           (-> machine
               (assoc :transaction 0)
-              (update :inside money/subtract change)
+              (update :inside money/subtract possibleChange)
               (update-in [:slots position :quantity] dec)))))))
 
 (defn load-snack [machine position slot]
