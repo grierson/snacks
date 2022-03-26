@@ -8,7 +8,6 @@
 (spec/def ::fives nat-int?)
 (spec/def ::twenties nat-int?)
 
-
 (spec/def ::money (spec/keys :req-un [::ones ::tens ::quarters ::dollars ::fives ::twenties]))
 (defrecord money [ones tens quarters dollars fives twenties])
 
@@ -26,7 +25,7 @@
            :args (spec/cat :ones ::ones :tens ::tens :quarters ::quarters :dollars ::dollars :fives ::fives :twenties ::twenties)
            :ret ::money)
 
-(defn total [m1 m2]
+(defn add [m1 m2]
   (->money
     (+ (:ones m1) (:ones m2))
     (+ (:tens m1) (:tens m2))
@@ -34,6 +33,15 @@
     (+ (:dollars m1) (:dollars m2))
     (+ (:fives m1) (:fives m2))
     (+ (:twenties m1) (:twenties m2))))
+
+(defn multiply [m1 multiplier]
+  (->money
+    (* (:ones m1) multiplier)
+    (* (:tens m1) multiplier)
+    (* (:quarters m1) multiplier)
+    (* (:dollars m1) multiplier)
+    (* (:fives m1) multiplier)
+    (* (:twenties m1) multiplier)))
 
 (defn amount [{:keys [ones tens quarters dollars fives twenties]}]
   (+ (* ones 0.01)

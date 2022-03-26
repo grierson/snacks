@@ -7,8 +7,8 @@
 
 (deftest total-test
   (is (= (->money 2 4 6 8 10 12)
-         (total (->money 1 2 3 4 5 6)
-                (->money 1 2 3 4 5 6)))))
+         (add (->money 1 2 3 4 5 6)
+              (->money 1 2 3 4 5 6)))))
 
 
 (deftest money-is-same-if-contains-same-money-test
